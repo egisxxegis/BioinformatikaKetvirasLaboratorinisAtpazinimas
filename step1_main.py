@@ -13,12 +13,12 @@ source_file = "data/maffta_5_done_with_external_tool.fasta.txt"
 probe_max_region_bp = 200
 probe_max_mismatches = 3
 probe_min_start_matches = 5
-probe_min_length = 16
+probe_min_length = 19
 probe_max_length = 20
 probe_target_percentage = 100  # how much sequences we want to cover
 gap_symbol = "-"
-probe_gap_means_evil_in_detection = False
-probe_initial_sensitivity = 80  # 0 - 100. 100 reacts to slightest change. 0 ignores everything
+probe_gap_means_evil_in_detection = True
+# probe_initial_sensitivity = 80  # 0 - 100. 100 reacts to slightest change. 0 ignores everything
 
 
 # code below
@@ -165,7 +165,7 @@ def write_probes(probes: [TheProbe]):
     file.write(f"# first number - amount of probes; nextly, each probe is described with start, end, seq\n")
     file.write(f"{len(probes)}\n")
     for probe in probes:
-        file.write(f"{probe.start+1} {probe.end}\n")
+        file.write(f"{probe.start+1}\n{probe.end}\n")
         file.write(f"{probe.seq}\n")
     file.close()
 
@@ -195,7 +195,7 @@ def main():
     g_count = get_greedy_count(counts)
     g_count_max = max([x.count for x in g_count])
     print(f"greedy count got. max count: {g_count_max} / {len(seqs)}")
-    g_probe_delta = g_count_max/100*(100-probe_initial_sensitivity)*-1
+    # g_probe_delta = g_count_max/100*(100-probe_initial_sensitivity)*-1
     # print(f"getting greedy probes init with delta = {g_probe_delta}")
     # g_probe_starts = get_greedy_probe_starts(g_count, g_probe_delta)
     # print(f"got {len(g_probe_starts)} init probes")

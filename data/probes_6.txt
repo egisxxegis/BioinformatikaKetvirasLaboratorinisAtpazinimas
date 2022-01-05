@@ -1,0 +1,6 @@
+# first number - amount of probes; nextly, each probe is described with start, end, seq
+2
+3048 3063
+CTTTTGTTATGATGTC
+3048 3063
+CATTCGTCATGATGTC

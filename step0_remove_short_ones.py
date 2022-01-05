@@ -1,5 +1,5 @@
 
-class TheSeq:
+class __TheSeq:
     def __init__(self, name: str, seq: str):
         self.name = name
         self.org_seq = seq
@@ -23,12 +23,12 @@ def main():
             continue
         else:
             if line[0] == ">":
-                seqs.append(TheSeq(head, body))
+                seqs.append(__TheSeq(head, body))
                 body = ""
                 head = line
                 continue
             body = body + line
-    seqs.append(TheSeq(head, body))
+    seqs.append(__TheSeq(head, body))
     seq_file.close()
 
     seq_sizes = []

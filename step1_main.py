@@ -5,17 +5,18 @@ import math
 from TheSeq import TheSeq
 from TheSymbolsCounter import TheSymbolsCounter
 from TheSymbol import TheSymbol
-from TheProbeStart import TheProbeStart
+# from TheProbeStart import TheProbeStart
 from TheProbe import TheProbe
 
 # settings
 source_file = "data/maffta_5_done_with_external_tool.fasta.txt"
+output_file = "data/probes_6.txt"
 probe_max_region_bp = 200
 probe_max_mismatches = 3
 probe_min_start_matches = 5
 probe_min_length = 19
 probe_max_length = 20
-probe_target_percentage = 100  # how much sequences we want to cover
+probe_target_percentage = 100  # how much sequences we want to cover in percent
 gap_symbol = "-"
 probe_gap_means_evil_in_detection = True
 # probe_initial_sensitivity = 80  # 0 - 100. 100 reacts to slightest change. 0 ignores everything
@@ -160,13 +161,20 @@ def is_sequence_detected(seq: [chr], probe: TheProbe):
     return True
 
 
-def write_probes(probes: [TheProbe]):
-    file = open("data/probes_6.txt", "w")
-    file.write(f"# first number - amount of probes; nextly, each probe is described with start, end, seq\n")
+def write_probes(probes: [TheProbe], reference_seq_obj: TheSeq):
+    file = open(output_file, "w")
+    file.write(f"# Amount of probes:\n")
     file.write(f"{len(probes)}\n")
     for probe in probes:
+        file.write(f"# probe: start pos, end pos, sequence\n")
         file.write(f"{probe.start+1}\n{probe.end}\n")
         file.write(f"{probe.seq}\n")
+    ze_name = reference_seq_obj.name.replace("\r", "").replace("\n", "")
+    if ze_name[0] != ">":
+        ze_name = ">" + ze_name
+    file.write(f"# Reference sequence in fasta\n")
+    file.write(f"{ze_name}\n"
+               f"{reference_seq_obj.seq}")
     file.close()
 
 
@@ -184,6 +192,7 @@ def main():
 
     target_sequences = math.ceil(len(seqs) / 100 * (100-probe_target_percentage))
     print("------")
+    reference_seq = seqs[0]
     print("length of first sequence = " + str(len(seqs[0].seq)) + " .")
     print("number of sequences = " + str(len(seqs)))
     print(f"targeted amount of sequences to remain undetected = {target_sequences}")
@@ -230,8 +239,8 @@ def main():
               f"Still ({len(seqs) - target_sequences}) seqs to go for {probe_target_percentage} % rate")
         if len(seqs) <= target_sequences:
             print("All seqs detected. Work is done.")
-            write_probes(probes)
-            print("Probes wrote into file at /data")
+            write_probes(probes, reference_seq)
+            print("Probes wrote into file at " + output_file)
             return
 
         the_slice = [max_probe.start, max_end_index]

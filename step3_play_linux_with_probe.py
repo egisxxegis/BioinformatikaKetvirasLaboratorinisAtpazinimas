@@ -24,7 +24,6 @@ def get_maffted_seq(the_file, the_name):
     seqs = read_fasta(the_file)
     for seq in seqs:
         seq.name = seq.name.replace("\r", "").replace("\n", "")
-        print(f"comparing [{seq.name}] [{the_name}]")
         if seq.name == the_name:
             return seq
     return None

@@ -6,7 +6,7 @@ maffted_output_file = "data/maffted_user_output_8.fasta.txt"
 probe_max_mismatches = 3
 probe_min_start_matches = 5
 gap_symbol = "-"
-probe_gap_means_evil_in_detection = True
+probe_gap_means_evil_in_detection = False
 
 
 def save_seq_to_fasta(the_file, seq_name, seq_seq):
@@ -29,12 +29,26 @@ def get_maffted_seq(the_file, the_name):
     return None
 
 
+def get_seq_without_name_from_file(the_file):
+    file = open(the_file, "r")
+    seq = ""
+    while the_line := file.readline():
+        seq = seq + the_line
+    return seq
+
+
 if __name__ == "__main__":
     z_probes, reference_seq = get_probes(file_name)
     line = "-------------------------------"
     the_name_of_user_input = "-------The input of user-------- UNNAMED SAMPLE."
     while True:
-        the_seq = input("Input sequence for check\n").replace("\r", "").replace("\n", "").upper()
+        the_seq = input("Input sequence for check\n").replace("\r", "").replace("\n", "")
+        if len(the_seq) > 10 and the_seq.lstrip(" ")[:6] == "--file":
+            c_line = the_seq.strip("\n").strip("\r").strip(" ")
+            input_file = the_seq.split("--file")[1].strip(" ")
+            the_seq = get_seq_without_name_from_file(input_file)
+            print("Got input from file.")
+        the_seq = the_seq.upper()
         if len(the_seq) != len(reference_seq.seq):
             print("Your sequence doesn't match target len! " + f"({len(the_seq)} != {len(reference_seq.seq)})\n"
                   "Mafft'ing your sequence.")
@@ -43,7 +57,8 @@ if __name__ == "__main__":
             save_seq_to_fasta(mafft_org, reference_seq.name, reference_seq.seq)
             save_seq_to_fasta(mafft_input, the_name_of_user_input, the_seq)
 
-            cmd = f"mafft --addfull {mafft_input} --keeplength {mafft_org} > {maffted_output_file}"
+            cmd = f"mafft --maxiterate 1000 --localpair " \
+                  f"--addfull {mafft_input} --keeplength {mafft_org} > {maffted_output_file}"
             print("Calling the command: \n" + cmd + "\n" + line)
             os.system(cmd)
             print(line + "\nCommand has finished.")
